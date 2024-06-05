@@ -59,10 +59,14 @@
                     background-color: rgba(68, 108, 183, 0.934);
 
                 }
+                &.disabled{
+                    cursor: not-allowed;
+                    color: red;
+                }
             }
         }
     }
-    .separator{
+    .separatore{
        height: 80%;
        width: 2px;
        background-color: #dddddd35;
