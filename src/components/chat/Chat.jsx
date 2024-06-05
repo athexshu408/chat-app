@@ -30,7 +30,8 @@ const Chat = () => {
 
   const endRef = useState(null);
 
-  const { chatId, user } = usechatStore();
+  const { chatId, user, isCurrentUserBlocked, isReceiverBlocked } =
+    usechatStore();
   const { currentuser } = userStore();
 
   useEffect(() => {
@@ -70,7 +71,7 @@ const Chat = () => {
       if (image.file) {
         imgUrl = await Upload(image.file);
       }
-    
+
       await updateDoc(doc(db, "chats", chatId), {
         messages: arrayUnion({
           senderId: currentuser.id,
@@ -130,7 +131,14 @@ const Chat = () => {
       </div>
       <div className="center">
         {chat?.messages?.map((message) => (
-          <div className={message?.senderId === currentuser?.id  ? "message Own " : "message " }    key={message?.createAt}>
+          <div
+            className={
+              message?.senderId === currentuser?.id
+                ? "message Own "
+                : "message "
+            }
+            key={message?.createAt}
+          >
             <div className="texts">
               {message.image && <img src={message.image} alt="" />}
               <p>{message.text}</p>
@@ -139,11 +147,13 @@ const Chat = () => {
           </div>
         ))}
 
-        {image.url &&(<div className="message Own">
-          <div className="texts">
-            <img src={image.url} alt="" />
+        {image.url && (
+          <div className="message Own">
+            <div className="texts">
+              <img src={image.url} alt="" />
+            </div>
           </div>
-        </div>)}
+        )}
 
         <div ref={endRef}></div>
       </div>
@@ -164,9 +174,14 @@ const Chat = () => {
         </div>
         <input
           type="text"
-          placeholder="Type a message"
+          placeholder={
+            isCurrentUserBlocked || isReceiverBlocked
+              ? "you can not send message"
+              : "Type a message...."
+          }
           onChange={(e) => setText(e.target.value)}
           value={text}
+          disabled={isCurrentUserBlocked || isReceiverBlocked}
         />
         <div className="emoji">
           <img
@@ -178,7 +193,11 @@ const Chat = () => {
             <EmojiPicker open={open} onEmojiClick={handleEmoji} />
           </div>
         </div>
-        <button className="sendButton" onClick={handleSend}>
+        <button
+          className="sendButton"
+          onClick={handleSend}
+          disabled={isCurrentUserBlocked || isReceiverBlocked}
+        >
           Send
         </button>
       </div>

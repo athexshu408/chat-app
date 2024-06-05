@@ -1,14 +1,41 @@
 import React from "react";
 
 import "./detail.css";
-import { auth } from "../../lib/firebase";
+import { auth, db } from "../../lib/firebase";
+import { userStore } from "../../lib/userStore";
+import { usechatStore } from "../../lib/usechatStore";
+import { arrayRemove, arrayUnion, doc, updateDoc } from "firebase/firestore";
 
 const Detail = () => {
+  const {
+    chatId,
+    user,
+    isCurrentUserBlocked,
+    isReceiverBlocked,
+    changeBlock,
+  } = usechatStore();
+  const { currentuser } = userStore();
+  const handleBlock = async () => {
+
+    if(!user)return;
+         
+    const userDocRed = doc(db,"users",currentuser.id);
+
+    try {
+            await updateDoc(userDocRed ,{
+              blocked : isReceiverBlocked? arrayRemove(user.id): arrayUnion(user.id)
+            })
+            changeBlock()
+    } catch (error) {
+      
+    }
+     
+  };
   return (
     <div className="detail">
       <div className="user">
-        <img src="./avatar.png" alt="" />
-        <h2>jane does</h2>
+        <img src={user?.avatar || "./avatar.png"} alt="" />
+        <h2>{user?.username}</h2>
         <p>Lorem ipsum dolor sit amet.</p>
       </div>
       <div className="info">
@@ -30,7 +57,6 @@ const Detail = () => {
             <img src="./arrowDown.png" alt="" />
           </div>
           <div className="photos">
-            
             <div className="photoItem">
               <div className="photoDetail">
                 <img
@@ -39,7 +65,7 @@ const Detail = () => {
                 />
                 <span>Lorem ipsum dolor sit amet.</span>
               </div>
-              <img src="./download.png"  className="icon" alt="" />
+              <img src="./download.png" className="icon" alt="" />
             </div>
             <div className="photoItem">
               <div className="photoDetail">
@@ -49,9 +75,8 @@ const Detail = () => {
                 />
                 <span>Lorem ipsum dolor sit amet.</span>
               </div>
-              <img src="./download.png"  className="icon" alt="" />
+              <img src="./download.png" className="icon" alt="" />
             </div>
-            
           </div>
         </div>
         <div className="options">
@@ -60,9 +85,11 @@ const Detail = () => {
             <img src="./arrowUp.png" alt="" />
           </div>
         </div>
-        <button onClick={handleBlock}> Block User</button>
-        <button className="logout" onClick={()=>auth.signOut()}> Logout</button>
-
+        <button onClick={handleBlock}> {isCurrentUserBlocked? "you are block" : isReceiverBlocked? "User Blocked" : "Block User"}</button>
+        <button className="logout" onClick={() => auth.signOut()}>
+          {" "}
+          Logout
+        </button>
       </div>
     </div>
   );

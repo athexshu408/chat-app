@@ -148,6 +148,11 @@
         padding: 20px;
         border-radius: 10px;
         font-size: 16px;
+        &:disabled{
+            cursor: not-allowed;
+      
+
+        }
 
     }
 
@@ -170,6 +175,12 @@
         padding: 10px 20px;
         border-radius: 5px;
         cursor: pointer;
+
+        &:disabled{
+            cursor: not-allowed;
+        background-color: #5182feb7;
+
+        }
     }
 }
 }
